@@ -1,1 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Praying Darlings — Creative Studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0a0a0a;
+      --fg: #f5f5f5;
+      --muted: #9e9e9e;
+      --accent: #d4af37;
+      --glass: rgba(10, 10, 10, 0.75);
+    }
+
+    /* ANIMATED GRADIENT BACKGROUND */
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .gradient-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, 
+        rgba(212, 175, 55, 0.05), 
+        rgba(0, 0, 0, 0.3), 
+        rgba(212, 175, 55, 0.03),
+        rgba(0, 0, 0, 0.3));
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* FLOATING PARTICLES */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.3; }
+      50% { transform: translateY(-20px) translateX(10px); opacity: 0.6; }
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: float 8s infinite ease-in-out;
+    }
+
+    /* DECORATIVE LINES */
+    .decorative-line {
+      position: relative;
+      width: 100px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      margin: 30px auto;
+    }
+
+    .decorative-line::before,
+    .decorative-line::after {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+      top: -1.5px;
+    }
+
+    .decorative-line::before { left: 0; }
+    .decorative-line::after { right: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #000;
+      color: var(--fg);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* VIDEO BACKGROUND */
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .video-background video {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+      opacity: 0.4;
+      filter: brightness(0.6) contrast(1.1);
+    }
+
+    .video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+    }
+
+    /* NAVIGATION */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 30px 6vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.95), transparent);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 300;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      position: relative;
+    }
+
+    .logo::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--accent);
+      transition: width 0.4s ease;
+    }
+
+    .logo:hover::after {
+      width: 100%;
+    }
+
+    .nav-links a {
+      margin-left: 40px;
+      font-size: 0.9rem;
+      color: var(--fg);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+      position: relative;
+      padding-bottom: 5px;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 1px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* HERO SECTION */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      padding: 0 5vw;
+    }
+
+    .hero-content {
+      animation: fadeInUp 1.5s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(4rem, 10vw, 8rem);
+      font-weight: 300;
+      letter-spacing: 8px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #ffffff, #b8b8b8, #ffffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
+
+    .tagline {
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      letter-spacing: 4px;
+      color: var(--muted);
+      margin-bottom: 60px;
+      text-transform: uppercase;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 18px 50px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--fg);
+      text-decoration: none;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .cta-button:hover::before {
+      left: 100%;
+    }
+
+    .cta-button:hover {
+      background: rgba(212, 175, 55, 0.1);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(212, 175, 55, 0.3),
+                  0 0 20px rgba(212, 175, 55, 0.2);
+    }
+
+    /* SECTIONS */
+    section {
+      position: relative;
+      padding: 120px 8vw;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 300;
+      letter-spacing: 3px;
+      margin-bottom: 60px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    /* LOCATION SECTION */
+    .location-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 80px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .info-card {
+      text-align: center;
+    }
+
+    .info-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .info-card p {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    .address-link {
+      display: inline-block;
+      margin-top: 10px;
+      color: var(--fg);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .address-link:hover {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .instagram-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 30px;
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--fg);
+      text-decoration: none;
+      letter-spacing: 1px;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .instagram-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--accent);
+    }
+
+    /* PRICING SECTION */
+    .pricing-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .price-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 60px 40px;
+      text-align: center;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .price-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+      box-shadow: 0 20px 60px rgba(212, 175, 55, 0.1);
+    }
+
+    .price-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4rem;
+      font-weight: 300;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .price-details {
+      font-size: 1.1rem;
+      color: var(--fg);
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    .price-note {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* BOOKING SECTION */
+    .booking-info {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 50px;
+    }
+
+    .booking-info h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      margin-bottom: 30px;
+      color: var(--accent);
+    }
+
+    .booking-subtitle {
+      font-size: 1.1rem;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .time-slots {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 30px 0;
+      flex-wrap: wrap;
+    }
+
+    .time-slot {
+      background: rgba(212, 175, 55, 0.05);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      padding: 20px 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .time-slot:hover {
+      background: rgba(212, 175, 55, 0.1);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+    }
+
+    .time-icon {
+      font-size: 1.5rem;
+    }
+
+    .time-text {
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+
+    /* CALENDAR WRAPPER */
+    .calendar-section {
+      max-width: 1000px;
+      margin: 50px auto;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 12px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .calendar-section h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+      text-align: center;
+      color: var(--accent);
+    }
+
+    .calendar-note {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 25px;
+      font-size: 0.95rem;
+    }
+
+    .calendar-wrapper {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .calendar-wrapper iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+
+    /* BOOKING BUTTON */
+    .booking-section {
+      max-width: 800px;
+      margin: 60px auto 0;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 12px;
+      padding: 50px 40px;
+      backdrop-filter: blur(10px);
+    }
+
+    .booking-section h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+
+    .booking-section p {
+      color: var(--muted);
+      margin-bottom: 35px;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    .booking-button {
+      display: inline-block;
+      padding: 20px 60px;
+      background: rgba(212, 175, 55, 0.15);
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.4s ease;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .booking-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .booking-button:hover::before {
+      left: 100%;
+    }
+
+    .booking-button:hover {
+      background: var(--accent);
+      color: #000;
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4);
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 80px 8vw 40px;
+      background: rgba(0, 0, 0, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .footer-info {
+      text-align: right;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      opacity: 0.6;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav {
+        padding: 20px 5vw;
+      }
+
+      .nav-links a {
+        margin-left: 20px;
+        font-size: 0.8rem;
+      }
+
+      h1 {
+        letter-spacing: 4px;
+      }
+
+      .tagline {
+        letter-spacing: 2px;
+      }
+
+      section {
+        padding: 80px 5vw;
+      }
+
+      .location-grid {
+        gap: 50px;
+      }
+
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-info {
+        text-align: center;
+      }
+
+      .time-slots {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .calendar-section {
+        padding: 25px 20px;
+      }
+
+      .booking-section {
+        padding: 35px 25px;
+      }
+    }
+  </style>
+
+</head>
+<body>
+
+  <!-- PARTICLES & GRADIENTS -->
+  <div class="gradient-overlay"></div>
+  <div class="particles" id="particles"></div>
+
+  <!-- VIDEO BACKGROUND -->
+  <div class="video-background">
+    <video autoplay muted loop playsinline>
+      <source src="https://www.dropbox.com/scl/fi/u3yowanv37adm7dwbx89n/Video-Dec-16-2025-4-00-12-PM.mov?rlkey=d2znxao5v02rcu7oakwwfu0rs&st=s1iu6emv&raw=1" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+  </div>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <div class="logo">Praying Darlings</div>
+    <div class="nav-links">
+      <a href="#location">Location</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#availability">Book</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Praying Darlings</h1>
+      <p class="tagline">Creative Studio — Silver Lake</p>
+      <a href="#availability" class="cta-button">Book Your Session</a>
+    </div>
+  </section>
+
+  <!-- LOCATION -->
+  <section id="location">
+    <h2>Studio</h2>
+    <div class="decorative-line"></div>
+    <div class="location-grid">
+      <div class="info-card">
+        <h3>Location</h3>
+        <p>
+          <a href="https://maps.google.com/?q=1933+W+Kingston+Place+Los+Angeles" target="_blank" class="address-link">
+            1933 W Kingston's Place<br>
+            Los Angeles, CA
+          </a>
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h3>Experience</h3>
+        <p>
+          Premium creative space featuring<br>
+          full bar service & espresso bar.<br>
+          Perfect for shoots, events & creative work.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h3>Connect</h3>
+        <p>
+          <a href="https://www.instagram.com/praying.darlings?igsh=NTc4MTIwNjQ2YQ%3D%3D&utm_source=qr" target="_blank" class="instagram-link">
+            <span>Follow on Instagram</span>
+            <span>↗</span>
+          </a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <h2>Pricing</h2>
+    <div class="decorative-line"></div>
+    <div class="pricing-container">
+      <div class="price-card">
+        <div class="price-number">$150</div>
+        <div class="price-details">
+          4 Hours<br>
+          Up to 6 People
+        </div>
+      </div>
+
+      <div class="price-card">
+        <div class="price-number">$1000</div>
+        <div class="price-details">
+          Full Day<br>
+          More than 6 People
+        </div>
+      </div>
+    </div>
+    <p class="price-note" style="text-align: center; margin-top: 50px; color: var(--muted);">
+      All bookings include complimentary bar & espresso service
+    </p>
+  </section>
+
+  <!-- BOOKING & AVAILABILITY -->
+  <section id="availability">
+    <h2>Book Your Session</h2>
+    <div class="decorative-line"></div>
+    
+    <div class="booking-info">
+      <h3>Available Time Slots</h3>
+      <div class="time-slots">
+        <div class="time-slot">
+          <span class="time-icon">☀️</span>
+          <span class="time-text">10:00 AM - 2:00 PM</span>
+        </div>
+        <div class="time-slot">
+          <span class="time-icon">🌅</span>
+          <span class="time-text">2:30 PM - 6:30 PM</span>
+        </div>
+      </div>
+      <p class="booking-subtitle">Check our calendar below to view available dates</p>
+    </div>
+
+    <!-- GOOGLE CALENDAR (READ-ONLY) -->
+    <div class="calendar-section">
+      <h4>Studio Availability</h4>
+      <p class="calendar-note">This calendar is view-only. Use the booking form below to reserve your spot.</p>
+      <div class="calendar-wrapper">
+        <iframe 
+          src="https://calendar.google.com/calendar/embed?src=AcZssZ28OJrrD9pCsnUMsWMHYlA-2AEH26LvxwlxMocVh_r7k8yBJxmNUXZIyOjjw4ZkBezWUruWWPJw&ctz=America%2FLos_Angeles&mode=MONTH&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&showTz=0">
+        </iframe>
+      </div>
+    </div>
+
+    <!-- BOOKING FORM BUTTON -->
+    <div class="booking-section">
+      <h4>Reserve Your Spot</h4>
+      <p>
+        Choose your session and submit a booking request. 
+        After submission, complete payment via the instructions in the confirmation message.
+      </p>
+      <a class="booking-button" href="https://docs.google.com/forms/d/e/1FAIpQLSct0djY8AqKR2X05gHwjsce0QFOn738r0w98MgV6-D9GS427w/viewform" target="_blank">
+        Book Now
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-logo">Praying Darlings</div>
+      <div class="footer-info">
+        1933 W Kingston's Place<br>
+        Silver Lake, Los Angeles<br>
+        © 2025 Praying Darlings Studio
+      </div>
+    </div>
+    <p class="footer-note">All sessions are confirmed after payment</p>
+  </footer>
+
+  <script>
+    // Generate floating particles
+    const particlesContainer = document.getElementById('particles');
+    const particleCount = 30;
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 8 + 's';
+      particle.style.animationDuration = (8 + Math.random() * 4) + 's';
+      particlesContainer.appendChild(particle);
+    }
+
+    // Smooth scroll for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
